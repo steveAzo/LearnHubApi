@@ -1,21 +1,23 @@
 import pymongo
 import json
-from utils.db_connection import connect_to_database
 
-client, db = connect_to_database()
+# Connect to MongoDB
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client["courses"]
 collection = db["courses"]
 
 # Read courses from courses.json
 with open("courses.json", "r") as f:
     courses = json.load(f)
 
+# Create index for efficient retrieval
 collection.create_index("name")
 
-# Adding rating field to each course
+# add rating field to each course
 for course in courses:
-    course['rating'] = { 'total': 0, 'count': 0 }
-
-# Adding rating field to each chapter
+    course['rating'] = {'total': 0, 'count': 0}
+    
+# add rating field to each chapter
 for course in courses:
     for chapter in course['chapters']:
         chapter['rating'] = {'total': 0, 'count': 0}
@@ -26,4 +28,3 @@ for course in courses:
 
 # Close MongoDB connection
 client.close()
-
